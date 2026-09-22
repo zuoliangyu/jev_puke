@@ -412,6 +412,36 @@
   margin-left: 18px;
   margin-right: 18px;
 }
+.config .settings-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 2px 18px 14px;
+}
+.config .settings-actions .settings-save {
+  width: auto;
+  flex: 0 0 auto;
+  display: inline-flex;
+  justify-content: center;
+  padding: 9px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--ink);
+  background: #12382bd9;
+  font: 10px var(--mono);
+}
+.config .settings-actions .settings-save:hover {
+  border-color: var(--green);
+  color: #f5fae7;
+}
+.config .settings-actions span {
+  color: var(--green);
+  font: 9px var(--mono);
+  line-height: 1.4;
+}
+.config .settings-actions span.error {
+  color: var(--red);
+}
 .name-grid {
   padding-left: 18px;
   padding-right: 18px;

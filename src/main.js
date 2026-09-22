@@ -1,4 +1,5 @@
 import { $ } from "./core/dom.js";
+import { loadSettings, saveSettings } from "./core/settings.js";
 import { state } from "./core/state.js";
 import { loadApiStatus } from "./api/jev.js";
 import { deal, resetView, runPhaseTurn } from "./game/engine.js";
@@ -47,6 +48,19 @@ $("#configToggle").addEventListener("click", () => {
   toggle.querySelector("b").textContent = open ? "+" : "−";
 });
 
+$("#saveSettings").addEventListener("click", () => {
+  const status = $("#settingsStatus");
+  const saved = saveSettings();
+  status.textContent = saved
+    ? "已保存 · API Key 仅当前页面"
+    : "保存失败 · 浏览器禁止本地存储";
+  status.className = saved ? "saved" : "error";
+  window.setTimeout(() => {
+    status.textContent = "";
+    status.className = "";
+  }, 3200);
+});
+
 $("#session").textContent =
   "LOCAL-" + Math.random().toString(36).slice(2, 6).toUpperCase();
 
@@ -58,6 +72,7 @@ $("#baseScore")?.addEventListener("input", () => {
   if (state.phase === "ready") resetScore();
 });
 
+loadSettings();
 syncNames();
 resetView();
 loadApiStatus();

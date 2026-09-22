@@ -280,6 +280,16 @@
                   placeholder="/api/jev 或 https://your-worker.example.com/jev"
                 /><label>API KEY <em>仅存当前页面</em></label
                 ><input id="key" type="password" placeholder="sk-…" />
+                <div class="settings-actions">
+                  <button id="saveSettings" class="settings-save" type="button">
+                    保存设置
+                  </button>
+                  <span
+                    id="settingsStatus"
+                    role="status"
+                    aria-live="polite"
+                  ></span>
+                </div>
                 <p>
                   无 Key 时运行本地完整牌局；配置 Key 后，每回合向 Jev
                   发送三位玩家的问题。
