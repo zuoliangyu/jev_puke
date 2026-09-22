@@ -14,6 +14,7 @@ import {
   renderPlayed,
   renderRawAnswer,
   renderScore,
+  log,
   resetScore,
   syncNames,
   updatePhase,
