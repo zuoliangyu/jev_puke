@@ -311,7 +311,7 @@ async function runJev() {
     const requestInfo = getRequestInfo();
     if (!requestInfo.demo) {
       log(
-        `<b>POST</b> · 代理 → ${requestInfo.target.replace(/^https?:\/\//, "")}`,
+        `<b>POST</b> · 3 个独立 Jev 请求 → ${requestInfo.target.replace(/^https?:\/\//, "")}`,
         "wait",
       );
     }
@@ -320,7 +320,7 @@ async function runJev() {
       log("<b>演示响应</b> · 本地模拟 Jev 选择", "ok");
     } else {
       log(
-        `<b>Jev 响应</b> · ${Object.keys(response.result.answers || {}).length} 个答案`,
+        `<b>Jev 响应</b> · ${response.requests || 0} 个独立答案${Object.keys(response.errors || {}).length ? ` · ${Object.keys(response.errors).length} 个失败` : ""}`,
         "ok",
       );
     }

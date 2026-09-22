@@ -38,7 +38,7 @@ node server.mjs
 - 请求类型：同步 `POST JSON`
 - 本地代理：`/api/jev`
 
-服务端推荐使用 `JEV_API_KEY`，每回合由 Node 服务通过本地 `/api/jev` 路由提交三位玩家的状态，并返回各自的 `choice` 与 `score` 判断。页面中的 API Key 输入只作为临时覆盖，不会写入仓库或 `localStorage`。
+服务端推荐使用 `JEV_API_KEY`。每回合页面会通过本地 `/api/jev` 路由并行提交三个独立请求，每个请求只包含对应玩家的完整手牌；其他玩家只以姓名、角色和手牌数量等公开信息出现，不会把其他玩家的牌面发给当前 Jev。页面再把三份响应合并到判断卡和日志中。页面中的 API Key 输入只作为临时覆盖，不会写入仓库或 `localStorage`。
 
 连接设置面板中的“保存设置”会把 Endpoint、Model、底分、玩家名称和代理地址保存到当前浏览器；API Key 始终只保留在当前页面内。
 
