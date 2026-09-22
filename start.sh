@@ -18,6 +18,25 @@ fi
 PORT_VALUE="${PORT:-4173}"
 URL="http://127.0.0.1:${PORT_VALUE}"
 
+if command -v curl >/dev/null 2>&1 && curl -fsS --max-time 2 "${URL}/healthz" >/dev/null 2>&1; then
+  echo "JEV Landlords Lab 已在运行：${URL}"
+  if [[ "${NO_BROWSER:-0}" != "1" ]]; then
+    if command -v xdg-open >/dev/null 2>&1; then
+      xdg-open "$URL" >/dev/null 2>&1 || true
+    elif command -v open >/dev/null 2>&1; then
+      open "$URL" >/dev/null 2>&1 || true
+    elif command -v wslview >/dev/null 2>&1; then
+      wslview "$URL" >/dev/null 2>&1 || true
+    fi
+  fi
+  exit 0
+fi
+
+if command -v lsof >/dev/null 2>&1 && lsof -t -iTCP:"${PORT_VALUE}" -sTCP:LISTEN >/dev/null 2>&1; then
+  echo "端口 ${PORT_VALUE} 已被其他程序占用。请更换 PORT，或先释放该端口。" >&2
+  exit 1
+fi
+
 if [[ "${NO_BROWSER:-0}" != "1" ]]; then
   (
     sleep 0.7

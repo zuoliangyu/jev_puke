@@ -21,7 +21,7 @@ chmod +x start.sh  # 首次运行需要
 ./start.sh
 ```
 
-不想自动打开浏览器时，PowerShell 使用 `./start.ps1 -NoBrowser`，Shell 使用 `NO_BROWSER=1 ./start.sh`。也可以直接使用 Node.js 内置模块启动本地服务和 API 代理：
+不想自动打开浏览器时，PowerShell 使用 `./start.ps1 -NoBrowser`，Shell 使用 `NO_BROWSER=1 ./start.sh`。PowerShell 的 `-Restart` 会停止旧的 `server.mjs` 进程后重新启动，通常不需要手动查找并结束 PID。也可以直接使用 Node.js 内置模块启动本地服务和 API 代理：
 
 ```bash
 node server.mjs
