@@ -225,13 +225,22 @@ export async function loadApiStatus() {
       $("#modelBadge").textContent = data.model;
       $("#model").value = data.model;
     }
-    $("#cost").textContent = state.apiReady ? "LIVE" : "DEMO";
+    updateApiMode();
     return state.apiReady;
   } catch {
     state.apiReady = false;
-    $("#cost").textContent = "DEMO";
+    updateApiMode();
     return false;
   }
+}
+
+export function updateApiMode() {
+  const hasPageKey = Boolean($("#key")?.value.trim());
+  $("#cost").textContent = hasPageKey
+    ? "PAGE"
+    : state.apiReady
+      ? "LIVE"
+      : "DEMO";
 }
 
 function resolveProxy() {
@@ -241,14 +250,24 @@ function resolveProxy() {
     : configuredProxy;
 }
 
+export function getRequestInfo() {
+  const key = $("#key").value.trim();
+  const proxy = resolveProxy();
+  const serverLive = state.apiReady === true;
+  const demo = !key && !serverLive;
+  return {
+    demo,
+    target: demo ? "" : key ? proxy || $("#endpoint").value.trim() : "/api/jev",
+  };
+}
+
 export async function requestJev() {
   if (state.apiReady === null) await loadApiStatus();
 
   const payload = buildPayload();
   const key = $("#key").value.trim();
-  const proxy = resolveProxy();
-  const serverLive = state.apiReady === true;
-  const demo = !key && !serverLive;
+  const { demo, target } = getRequestInfo();
+  updateApiMode();
 
   if (demo) {
     await new Promise((resolve) => setTimeout(resolve, 300));
@@ -260,15 +279,25 @@ export async function requestJev() {
     return { result, data, demo, target: "" };
   }
 
-  const target = key ? proxy || $("#endpoint").value.trim() : "/api/jev";
-  const response = await fetch(target, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(key ? { Authorization: `Bearer ${key}` } : {}),
-    },
-    body: JSON.stringify(payload),
-  });
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), 25_000);
+  let response;
+  try {
+    response = await fetch(target, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(key ? { Authorization: `Bearer ${key}` } : {}),
+      },
+      body: JSON.stringify(payload),
+      signal: controller.signal,
+    });
+  } catch (error) {
+    if (error.name === "AbortError") throw Error("Jev 请求超时（25 秒）");
+    throw error;
+  } finally {
+    window.clearTimeout(timeout);
+  }
   const text = await response.text();
   let parsed;
   try {

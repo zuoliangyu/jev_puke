@@ -17,7 +17,13 @@ import {
   syncNames,
   updatePhase,
 } from "../ui/render.js";
-import { loadApiStatus, requestJev, usage } from "../api/jev.js";
+import {
+  getRequestInfo,
+  loadApiStatus,
+  requestJev,
+  updateApiMode,
+  usage,
+} from "../api/jev.js";
 import { typeLabel } from "../core/constants.js";
 
 export function resetView() {
@@ -289,7 +295,6 @@ export function applyPlay() {
 }
 
 async function runJev() {
-  if (state.apiReady === null) await loadApiStatus();
   const started = performance.now();
   $("#status").textContent = "RUNNING";
   $("#status").className = "running";
@@ -299,14 +304,18 @@ async function runJev() {
   );
 
   try {
+    if (state.apiReady === null) await loadApiStatus();
+    const requestInfo = getRequestInfo();
+    if (!requestInfo.demo) {
+      log(
+        `<b>POST</b> · 代理 → ${requestInfo.target.replace(/^https?:\/\//, "")}`,
+        "wait",
+      );
+    }
     const response = await requestJev();
     if (response.demo) {
       log("<b>演示响应</b> · 本地模拟 Jev 选择", "ok");
     } else {
-      log(
-        `<b>POST</b> · 代理 → ${response.target.replace(/^https?:\/\//, "")}`,
-        "wait",
-      );
       log(
         `<b>Jev 响应</b> · ${Object.keys(response.result.answers || {}).length} 个答案`,
         "ok",
@@ -321,7 +330,7 @@ async function runJev() {
     $("#latency").textContent = elapsed + " ms";
     $("#latency").title =
       `input ${tokenUsage.input} / output ${tokenUsage.output} tokens`;
-    $("#cost").textContent = response.demo ? "DEMO" : "LIVE";
+    updateApiMode();
     $("#status").textContent = state.phase === "bid" ? "BID" : "LIVE";
     $("#status").className = state.phase === "bid" ? "running" : "live";
     log(
@@ -332,6 +341,7 @@ async function runJev() {
   } catch (error) {
     $("#status").textContent = "ERROR";
     $("#status").className = "done";
+    updateApiMode();
     log(`<b>调用失败</b> · ${esc(error.message)}`, "err");
     const data = {};
     ids.forEach(

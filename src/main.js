@@ -1,7 +1,7 @@
 import { $ } from "./core/dom.js";
 import { loadSettings, saveSettings } from "./core/settings.js";
 import { state } from "./core/state.js";
-import { loadApiStatus } from "./api/jev.js";
+import { loadApiStatus, updateApiMode } from "./api/jev.js";
 import { deal, resetView, runPhaseTurn } from "./game/engine.js";
 import { log, resetScore, syncNames } from "./ui/render.js";
 
@@ -60,6 +60,8 @@ $("#saveSettings").addEventListener("click", () => {
     status.className = "";
   }, 3200);
 });
+
+$("#key").addEventListener("input", updateApiMode);
 
 $("#session").textContent =
   "LOCAL-" + Math.random().toString(36).slice(2, 6).toUpperCase();
