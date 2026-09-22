@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#0a100f" />
+    <title>JEV · 地主牌局实验室</title>
+    <link rel="icon" href="data:," />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=IBM+Plex+Sans+SC:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css?v=20260922-8" />
+  </head>
+  <body>
+    <div class="shell">
+      <header class="top">
+        <a class="brand" href="#top"
+          ><span class="logo">J</span
+          ><span><b>JEV</b><em>地 主 牌 局 实 验 室</em></span></a
+        >
+        <div class="meta">
+          <i></i> LIVE REPLAY <span>SESSION <b id="session">LOCAL</b></span
+          ><button id="reset" aria-label="重新发牌">↺</button>
+        </div>
+      </header>
+      <main id="top">
+        <section class="hero">
+          <div>
+            <small class="eyebrow">FULL GAME / 03 PLAYERS</small>
+            <h1>看一整局<br /><span>怎么落子。</span></h1>
+            <p>
+              每一回合都交给 Jev
+              判断，三位玩家的建议会随牌局一起推进，并留下完整的决策轨迹。
+            </p>
+          </div>
+          <div class="stats">
+            <div><small>MODEL</small><b id="modelBadge">jev-1.13</b></div>
+            <div><small>TURN</small><b id="turnStat">01 / 54</b></div>
+            <div><small>STATUS</small><b id="gameStat">READY</b></div>
+          </div>
+        </section>
+        <section class="game-grid">
+          <section class="table-col">
+            <div class="table">
+              <div class="table-head">
+                <span id="roundLabel">ROUND 01</span
+                ><span><i></i> LIVE REPLAY</span>
+              </div>
+              <div class="seat north">
+                <div class="jev-card" data-jev="north">
+                  <small>JEV · 左岚</small><b class="jev-action">等待判断</b>
+                  <div class="jev-picks">
+                    <span class="pick-play">打什么 · —</span
+                    ><span class="pick-style">打法 · —</span>
+                  </div>
+                  <span class="jev-risk">风险 —</span>
+                </div>
+                <b class="avatar blue">北</b
+                ><span class="player-name" data-player-name="north"
+                  ><strong class="name-text">左岚</strong
+                  ><small
+                    ><span id="northRole">待定</span> ·
+                    <em id="northCount">17</em> 张</small
+                  ><small class="score-line"
+                    >本局 <em id="northRoundScore">—</em> · 累计
+                    <em id="northTotalScore">0</em></small
+                  ></span
+                >
+                <div
+                  id="northHand"
+                  class="face-hand"
+                  aria-label="左岚明牌"
+                ></div>
+              </div>
+              <div class="seat west">
+                <div class="jev-card" data-jev="west">
+                  <small>JEV · 小符</small><b class="jev-action">等待判断</b>
+                  <div class="jev-picks">
+                    <span class="pick-play">打什么 · —</span
+                    ><span class="pick-style">打法 · —</span>
+                  </div>
+                  <span class="jev-risk">风险 —</span>
+                </div>
+                <b class="avatar yellow">南</b
+                ><span class="player-name" data-player-name="west"
+                  ><strong class="name-text">小符</strong
+                  ><small
+                    ><span id="westRole">待定</span> ·
+                    <em id="westCount">17</em> 张</small
+                  ><small class="score-line"
+                    >本局 <em id="westRoundScore">—</em> · 累计
+                    <em id="westTotalScore">0</em></small
+                  ></span
+                >
+                <div
+                  id="westHand"
+                  class="face-hand"
+                  aria-label="小符明牌"
+                ></div>
+              </div>
+              <div class="seat east">
+                <div class="jev-card" data-jev="east">
+                  <small>JEV · 长东</small><b class="jev-action">等待判断</b>
+                  <div class="jev-picks">
+                    <span class="pick-play">打什么 · —</span
+                    ><span class="pick-style">打法 · —</span>
+                  </div>
+                  <span class="jev-risk">风险 —</span>
+                </div>
+                <b class="avatar red">你</b
+                ><span class="player-name" data-player-name="east"
+                  ><strong class="name-text">长东</strong
+                  ><small
+                    ><span id="eastRole">待定</span> ·
+                    <em id="eastCount">17</em> 张</small
+                  ><small class="score-line"
+                    >本局 <em id="eastRoundScore">—</em> · 累计
+                    <em id="eastTotalScore">0</em></small
+                  ></span
+                >
+                <div
+                  id="eastHand"
+                  class="face-hand"
+                  aria-label="长东明牌"
+                ></div>
+              </div>
+              <div class="rings"></div>
+              <div id="center" class="center">
+                <i>◇</i><b>等待发牌</b><small>JEV STRUCTURED TABLE</small>
+              </div>
+              <div id="kitty" class="kitty" hidden>
+                <small>底牌</small>
+                <div></div>
+              </div>
+              <div id="played" class="played">
+                <small>本回合出牌</small>
+                <div class="played-cards"></div>
+              </div>
+              <div id="hand" class="hand-row">
+                <small>长东手牌 · 17 张</small>
+              </div>
+            </div>
+            <div class="caption">
+              <span>● 牌局状态同步</span><span id="hint">点击“开始牌局”</span>
+            </div>
+            <div class="controls">
+              <button id="deal" class="primary">✦ 开始牌局</button
+              ><button id="step">下一回合 →</button
+              ><button id="auto">自动播放</button
+              ><button id="pause" hidden>暂停</button>
+            </div>
+          </section>
+          <aside class="right">
+            <section class="panel">
+              <div class="ph">
+                <div>
+                  <small class="eyebrow">TURN DECISIONS</small>
+                  <h2>三位玩家的 Jev</h2>
+                </div>
+                <span id="status">READY</span>
+              </div>
+              <div id="turnSummary" class="turn-summary">
+                <i>✦</i>
+                <p>牌局还没有开始</p>
+                <small>发牌后，每回合会同时更新三位玩家的建议。</small>
+              </div>
+              <div id="decisionList" hidden></div>
+            </section>
+            <section class="panel logs">
+              <div class="ph compact">
+                <div>
+                  <small class="eyebrow">EVENT STREAM</small>
+                  <h2>调用日志</h2>
+                </div>
+                <button id="clear" class="link">清空</button>
+              </div>
+              <div id="log" class="log">
+                <p>尚无事件 · 牌局开始后将在这里展开</p>
+              </div>
+              <details class="raw-response">
+                <summary>原始回答 · answers</summary>
+                <pre id="rawAnswer">尚未调用 Jev</pre>
+              </details>
+            </section>
+            <section class="panel score-panel">
+              <div class="ph compact">
+                <div>
+                  <small class="eyebrow">ROUND SCORE</small>
+                  <h2>积分结算</h2>
+                </div>
+                <span id="scoreBadge">×1</span>
+              </div>
+              <div class="score-stats">
+                <div><small>底分</small><b id="baseScoreView">1</b></div>
+                <div><small>叫分</small><b id="bidScoreView">—</b></div>
+                <div><small>倍率</small><b id="multiplierView">×1</b></div>
+                <div><small>本局</small><b id="scoreTotalView">—</b></div>
+              </div>
+              <div id="scoreResult" class="score-result">
+                <p>牌局结束后显示三方得分变化</p>
+              </div>
+            </section>
+            <details class="panel rules-panel">
+              <summary>规则</summary>
+              <div class="rules-body">
+                <p>
+                  <b>单张 / 对子 / 三张</b><span>同点数 1、2、3 张牌。</span>
+                </p>
+                <p>
+                  <b>三带一 / 三带二</b
+                  ><span>三张同点数，分别带 1 张或 1 对。</span>
+                </p>
+                <p>
+                  <b>顺子 / 连对</b
+                  ><span>连续 5 张单牌，或连续 3 对；不含 2 和王。</span>
+                </p>
+                <p>
+                  <b>飞机</b><span>连续两组及以上三张，可带单牌或对子。</span>
+                </p>
+                <p>
+                  <b>四带二 / 炸弹 / 王炸</b
+                  ><span>四张同点数带牌；四张同点数；大小王。</span>
+                </p>
+                <p>
+                  <b>春天 / 反春</b
+                  ><span
+                    >地主先出完且农民未出牌为春天；农民获胜且地主只出一手为反春，均再翻倍。</span
+                  >
+                </p>
+                <p>
+                  <b>计分</b><span>炸弹、王炸各翻倍；春天、反春再翻倍。</span>
+                </p>
+              </div>
+            </details>
+            <div class="usage">
+              <div>
+                <small>TURN</small><b id="turnUsage">—</b><em>index</em>
+              </div>
+              <div><small>LATENCY</small><b id="latency">—</b><em>ms</em></div>
+              <div><small>MODE</small><b id="cost">DEMO</b><em>source</em></div>
+            </div>
+            <section class="panel config">
+              <button id="configToggle">
+                <span>⚙　连接设置</span><b>+</b>
+              </button>
+              <div id="config" hidden>
+                <label>ENDPOINT</label
+                ><input
+                  id="endpoint"
+                  value="https://www.e-flowcode.cc/v1/systemone"
+                /><label>MODEL</label
+                ><input id="model" value="jev-1.13" /><label
+                  >底分 <em>1-100</em></label
+                ><input
+                  id="baseScore"
+                  type="number"
+                  min="1"
+                  max="100"
+                  step="1"
+                  value="1"
+                /><label>玩家名称</label>
+                <div class="name-grid">
+                  <input
+                    id="northName"
+                    value="左岚"
+                    aria-label="左岚名称"
+                  /><input
+                    id="westName"
+                    value="小符"
+                    aria-label="小符名称"
+                  /><input id="eastName" value="长东" aria-label="长东名称" />
+                </div>
+                <label>PROXY（本地代理）</label
+                ><input
+                  id="proxy"
+                  value="/api/jev"
+                  placeholder="/api/jev 或 https://your-worker.example.com/jev"
+                /><label>API KEY <em>仅存当前页面</em></label
+                ><input id="key" type="password" placeholder="sk-…" />
+                <p>
+                  无 Key 时运行本地完整牌局；配置 Key 后，每回合向 Jev
+                  发送三位玩家的问题。
+                </p>
+              </div>
+            </section>
+          </aside>
+        </section>
+      </main>
+      <footer>
+        <span>JEV / LANDLORDS LAB</span
+        ><span>三人完整牌局 · 结构化判断展示</span
+        ><a
+          href="https://e-flowcode.cc/docs/setup/jev-api"
+          target="_blank"
+          rel="noreferrer"
+          >阅读 API 文档 ↗</a
+        >
+      </footer>
+    </div>
+    <script src="app.js" defer></script>
+  </body>
+</html>

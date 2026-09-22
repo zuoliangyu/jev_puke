@@ -1,0 +1,72 @@
+# JEV · 地主牌局实验室
+
+一个可部署为 Node.js 服务或 Docker 容器的三人斗地主完整牌局回放，用来展示 E-FlowCode Jev 结构化决策 API。项目仍可作为纯静态演示页面运行。
+
+页面会发出一副 54 张牌，先进入三人轮流叫地主，再由最高叫分者拿到底牌，之后按正常出牌和过牌流程推进。叫分阶段会校验更高叫分；三家都不叫时自动重新发牌。三位玩家全部明牌，牌面会铺在各自座位旁；每位玩家头顶都有独立 Jev 判断卡，右侧日志会记录发牌、出牌、每回合三人判断、耗时与错误。
+
+当前桌面端采用和风牌桌布局：左右玩家的明牌在各自侧边分栏展示，地主手牌在底部重叠铺开，中央保留牌权和底牌区域，Jev 判断与调用日志位于右侧玻璃面板。
+
+出牌演示包含单张、对子、三张、三带一、三带二、顺子、连对、飞机、四带二、炸弹和王炸；跟牌时会校验牌型和长度，炸弹可以压制普通牌型，王炸最大。页面的“规则”面板可展开查看牌型和春天/反春条件。积分面板支持设置 1-100 的底分，叫分作为基础倍数，炸弹和王炸每次令倍率翻倍，春天或反春再翻倍；每位玩家座位上会显示本局得分和跨局累计分。没有 API Key 时使用本地演示 Jev，但牌型选择仍按斗地主规则生成，方便完整回放一局。
+
+## 本地运行
+
+无需安装依赖。Windows 用户可以双击 `start.bat`；命令行用户使用 Node.js 内置模块启动本地服务和 API 代理：
+
+```bash
+node server.mjs
+```
+
+打开 <http://127.0.0.1:4173>。推荐把 Key 配置在服务端环境变量中；也可以在“连接设置”中临时填写 Key。没有 Key 时使用本地模拟响应，仍可完整播放；点击“自动播放”即可连续推进。
+
+## API 配置
+
+默认配置对应 E-FlowCode 文档：
+
+- Endpoint：`https://www.e-flowcode.cc/v1/systemone`
+- Model：`jev-1.13`
+- 请求类型：同步 `POST JSON`
+- 本地代理：`/api/jev`
+
+服务端推荐使用 `JEV_API_KEY`，每回合由 Node 服务通过本地 `/api/jev` 路由提交三位玩家的状态，并返回各自的 `choice` 与 `score` 判断。页面中的 API Key 输入只作为临时覆盖，不会写入仓库或 `localStorage`。
+
+页面中的 Jev 卡展示三方建议的“打什么、打法、风险与置信度”。真实 API 返回的建议用于展示和日志；牌局推进会再次对建议做本地合法性校验，避免出现不符合当前牌权的出牌。
+
+### CORS 代理
+
+浏览器直连远程 API 会遇到 CORS 预检限制。`server.mjs` 提供 `/api/jev` 同源服务端路由，服务端直接发起 HTTP 请求并转发 JSON 响应，不记录 Key。
+
+复制 `.env.example` 为 `.env` 后填写 `JEV_API_KEY`，或者设置环境变量：
+
+```powershell
+$env:JEV_API_KEY = "your-key"
+$env:JEV_TARGET = "https://your-endpoint.example.com/jev"
+node server.mjs
+```
+
+## Docker 部署
+
+```bash
+docker build -t jev-landlords-lab .
+docker run --rm -p 4173:4173 \
+  -e JEV_API_KEY=your-key \
+  jev-landlords-lab
+```
+
+服务默认监听 `0.0.0.0:4173`，也可以通过 `PORT`、`HOST`、`JEV_TARGET` 和 `JEV_MODEL` 覆盖。
+
+## 云平台部署
+
+Render、Railway、Fly.io 等支持 Node.js 或 Docker 的平台都可以直接部署本项目。启动命令使用 `node server.mjs`，把 `JEV_API_KEY` 配置为平台 Secret，并将服务端口设置为平台提供的 `PORT`。
+
+## GitHub Pages
+
+1. 新建 GitHub 仓库并推送项目文件。
+2. 打开 **Settings → Pages**。
+3. Source 选择 **Deploy from a branch**，选择 `main` 和 `/ (root)`。
+4. GitHub Pages 适合发布纯静态演示；要启用真实 Jev 调用，请把 Node/Docker 服务部署到支持后端运行的平台。
+
+本次会话中的真实 Key 没有写入文件；演示后建议在控制台轮换该 Key。
+
+## 参考
+
+- [Jev 决策 API 文档](https://e-flowcode.cc/docs/setup/jev-api)
