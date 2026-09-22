@@ -10,6 +10,7 @@ import {
   renderHand,
   renderJevCards,
   renderKitty,
+  renderPendingDecision,
   renderPlayed,
   renderRawAnswer,
   renderScore,
@@ -298,6 +299,7 @@ async function runJev() {
   const started = performance.now();
   $("#status").textContent = "RUNNING";
   $("#status").className = "running";
+  renderPendingDecision();
   log(
     `<b>${state.phase === "bid" ? "叫分" : "出牌"}判断</b> · ${state.players[ids[state.current]].name}`,
     "wait",

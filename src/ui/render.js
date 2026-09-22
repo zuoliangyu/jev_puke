@@ -272,6 +272,13 @@ export function renderDecisionList(data) {
     .join("");
 }
 
+export function renderPendingDecision() {
+  $("#turnSummary").hidden = false;
+  $("#decisionList").hidden = true;
+  $("#turnSummary").innerHTML =
+    "<i>✦</i><p>正在调用 Jev</p><small>三位玩家的判断请求已发出，等待响应。</small>";
+}
+
 export function renderRawAnswer(result, data) {
   const element = $("#rawAnswer");
   if (!element) return;
