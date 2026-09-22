@@ -10,7 +10,18 @@
 
 ## 本地运行
 
-无需安装依赖。Windows 用户可以双击 `start.bat`；命令行用户使用 Node.js 内置模块启动本地服务和 API 代理：
+无需安装依赖。Windows 用户可以双击 `start.bat`，或在 PowerShell 中运行 `./start.ps1`；Linux、macOS 和 WSL 用户运行 `./start.sh`。脚本会检查 Node.js 版本、启动本地服务，并默认打开浏览器：
+
+```powershell
+./start.ps1
+```
+
+```bash
+chmod +x start.sh  # 首次运行需要
+./start.sh
+```
+
+不想自动打开浏览器时，PowerShell 使用 `./start.ps1 -NoBrowser`，Shell 使用 `NO_BROWSER=1 ./start.sh`。也可以直接使用 Node.js 内置模块启动本地服务和 API 代理：
 
 ```bash
 node server.mjs
