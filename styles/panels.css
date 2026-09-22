@@ -1,0 +1,228 @@
+.caption {
+  display: flex;
+  justify-content: space-between;
+  padding: 13px 5px 0;
+  color: var(--muted);
+  font: 9px var(--mono);
+}
+.caption span:first-child {
+  color: var(--green);
+}
+.decision {
+  min-height: 290px;
+}
+.decision .ph > span {
+  padding: 4px 7px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  color: var(--muted);
+  font: 9px var(--mono);
+}
+.empty {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  min-height: 197px;
+  padding-bottom: 22px;
+  text-align: center;
+}
+.empty i {
+  display: grid;
+  place-items: center;
+  width: 41px;
+  height: 41px;
+  margin-bottom: 14px;
+  border: 1px solid #ef6d597a;
+  border-radius: 50%;
+  color: var(--red);
+  font-size: 19px;
+  font-style: normal;
+}
+.empty p {
+  margin: 0 0 6px;
+  font-size: 13px;
+}
+.empty small {
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.7;
+}
+.result {
+  padding: 0 20px 20px;
+}
+.rec {
+  display: flex;
+  justify-content: space-between;
+  padding: 13px 0 16px;
+  border-top: 1px solid var(--line);
+}
+.rec small {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--muted);
+  font: 9px var(--mono);
+}
+.rec strong {
+  color: var(--red);
+  font: 600 27px var(--display);
+}
+.rec .score {
+  color: var(--ink);
+  font: 500 22px var(--mono);
+}
+.answer {
+  padding: 10px 11px;
+  margin-top: 8px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: #fff1;
+}
+.answer-top,
+.answer-meta {
+  display: flex;
+  justify-content: space-between;
+}
+.answer-top {
+  margin-bottom: 8px;
+}
+.answer-name {
+  font: 11px var(--display);
+}
+.answer-type,
+.answer-meta {
+  color: var(--muted2);
+  font: 9px var(--mono);
+}
+.bar {
+  height: 4px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #fff1;
+}
+.bar i {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: var(--red);
+}
+.answer-meta {
+  margin-top: 7px;
+  color: var(--muted);
+}
+.answer-meta b {
+  color: var(--ink);
+  font-weight: 400;
+}
+.json-btn {
+  width: 100%;
+  margin-top: 13px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  color: var(--muted);
+  background: none;
+  font: 9px var(--mono);
+}
+pre.json {
+  max-height: 180px;
+  margin: 7px 0 0;
+  padding: 10px;
+  overflow: auto;
+  border-radius: 4px;
+  color: var(--green);
+  background: #08100e;
+  font: 9px/1.55 var(--mono);
+  white-space: pre-wrap;
+}
+.logs {
+  min-height: 252px;
+}
+.log {
+  max-height: 197px;
+  padding: 0 20px 15px;
+  overflow: auto;
+}
+.log > p {
+  padding: 36px 0;
+  margin: 0;
+  color: var(--muted2);
+  text-align: center;
+  font: 10px var(--mono);
+}
+.entry {
+  display: grid;
+  grid-template-columns: 47px 1fr;
+  gap: 10px;
+  padding: 8px 0;
+  border-top: 1px solid var(--line);
+  font-size: 10px;
+}
+.entry time {
+  color: var(--muted2);
+  font: 9px var(--mono);
+}
+.entry span {
+  color: var(--muted);
+  line-height: 1.45;
+}
+.entry b {
+  color: var(--ink);
+  font-weight: 500;
+}
+.entry.ok span {
+  color: var(--green);
+}
+.entry.err span {
+  color: var(--red);
+}
+.entry.wait span {
+  color: var(--amber);
+}
+.usage {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--line);
+}
+.usage > div {
+  padding: 13px 12px;
+  background: var(--panel);
+}
+.usage b {
+  display: inline-block;
+  margin: 7px 3px 4px 0;
+  font: 500 17px var(--mono);
+}
+.usage em {
+  color: var(--muted2);
+  font: 8px var(--mono);
+  font-style: normal;
+}
+.usage small {
+  letter-spacing: 0.1em;
+}
+footer {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 45px;
+  color: var(--muted2);
+  font: 9px var(--mono);
+  letter-spacing: 0.07em;
+}
+footer a {
+  color: var(--muted);
+  text-decoration: none;
+}
+footer a:hover {
+  color: var(--red);
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 3px;
+}

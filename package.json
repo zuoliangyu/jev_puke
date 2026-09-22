@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "node server.mjs",
-    "check": "node --check app.js && node --check server.mjs"
+    "check": "node --check src/main.js && node --check src/api/jev.js && node --check src/core/constants.js && node --check src/core/dom.js && node --check src/core/state.js && node --check src/game/cards.js && node --check src/game/engine.js && node --check src/game/rules.js && node --check src/ui/render.js && node --check server.mjs"
   },
   "engines": {
     "node": ">=18"
