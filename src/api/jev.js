@@ -294,28 +294,10 @@ async function requestOne(id, target, key) {
   return parsed;
 }
 
-function fallbackDecision(id) {
-  return state.phase === "bid"
-    ? {
-        action: "不叫",
-        bid: 0,
-        play: "不叫",
-        style: "等待重试",
-        risk: "高风险",
-        confidence: "—",
-      }
-    : {
-        action: "等待重试",
-        play: "—",
-        style: "—",
-        risk: "高风险",
-        confidence: "—",
-      };
-}
-
 export async function requestJev() {
   if (state.apiReady === null) await loadApiStatus();
 
+  const currentId = ids[state.current];
   const key = $("#key").value.trim();
   const { demo, target } = getRequestInfo();
   updateApiMode();
@@ -325,53 +307,25 @@ export async function requestJev() {
     const result = {
       usage: { prompt_tokens: state.phase === "bid" ? 68 : 104 },
     };
-    const data = demoJudgement();
-    result.answers = Object.fromEntries(ids.map((id) => [id, data[id]]));
-    return { result, data, demo, target: "", requests: 0 };
+    const judgement = demoJudgement()[currentId];
+    result.answers = { [currentId]: judgement };
+    return {
+      result,
+      data: { [currentId]: judgement },
+      demo,
+      target: "",
+      requests: 0,
+      player: currentId,
+    };
   }
 
-  const settled = await Promise.allSettled(
-    ids.map(async (id) => ({ id, result: await requestOne(id, target, key) })),
-  );
-  const answers = {};
-  const players = {};
-  const data = {};
-  const errors = {};
-  let input = 0;
-  let output = 0;
-
-  settled.forEach((item, index) => {
-    const id = ids[index];
-    if (item.status === "fulfilled") {
-      const result = item.value.result;
-      players[id] = result;
-      Object.assign(answers, result.answers || {});
-      data[id] = normalize(result, id);
-      const tokenUsage = usage(result.usage);
-      input += tokenUsage.input;
-      output += tokenUsage.output;
-    } else {
-      errors[id] = item.reason?.message || "未知错误";
-      data[id] = fallbackDecision(id);
-    }
-  });
-
-  if (!Object.keys(players).length) {
-    throw Error(`3 个独立 Jev 请求均失败：${Object.values(errors).join("；")}`);
-  }
-
-  const result = {
-    answers,
-    usage: { input_tokens: input, output_tokens: output },
-    players,
-    ...(Object.keys(errors).length ? { errors } : {}),
-  };
+  const result = await requestOne(currentId, target, key);
   return {
     result,
-    data,
+    data: { [currentId]: normalize(result, currentId) },
     demo,
     target,
-    requests: ids.length,
-    errors,
+    requests: 1,
+    player: currentId,
   };
 }

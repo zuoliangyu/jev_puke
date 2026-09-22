@@ -275,8 +275,10 @@ export function renderDecisionList(data) {
 export function renderPendingDecision() {
   $("#turnSummary").hidden = false;
   $("#decisionList").hidden = true;
+  const currentId = ids[state.current];
+  const currentName = state.players[currentId]?.name || "当前玩家";
   $("#turnSummary").innerHTML =
-    "<i>✦</i><p>正在调用 Jev</p><small>三位玩家的判断请求已发出，等待响应。</small>";
+    `<i>✦</i><p>正在调用 Jev</p><small>${esc(currentName)} 的独立判断请求已发出，等待响应。</small>`;
 }
 
 export function renderRawAnswer(result, data) {
