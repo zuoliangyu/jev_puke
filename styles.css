@@ -1,8 +1,4 @@
 @import "styles/base.css";
-@import "styles/board.css";
+@import "styles/table.css";
 @import "styles/panels.css";
 @import "styles/responsive.css";
-@import "styles/game.css";
-@import "styles/face.css";
-@import "styles/board-overrides.css";
-@import "styles/responsive-overrides.css";

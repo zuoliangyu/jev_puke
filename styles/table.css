@@ -1,0 +1,490 @@
+.game-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 18px;
+  align-items: start;
+}
+.table-col {
+  min-width: 0;
+}
+
+/* 牌桌网格：左右座位夹住中央牌区，底部是本家信息条与手牌 */
+.table {
+  --side: clamp(250px, 23%, 318px);
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--side) minmax(0, 1fr) var(--side);
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  grid-template-areas:
+    "head head head"
+    "left mid right"
+    "eseat eseat eseat"
+    "hand hand hand";
+  gap: 14px 22px;
+  height: clamp(700px, calc(100vh - 156px), 960px);
+  padding: 22px 26px 24px;
+  overflow: hidden;
+  border: 1px solid #c3f2d066;
+  border-radius: 30px;
+  background: radial-gradient(
+    ellipse at 50% 42%,
+    #3a8d65 0,
+    #1c5a43 36%,
+    #0d3025 76%,
+    #092019 100%
+  );
+  box-shadow:
+    inset 0 0 120px #03130c99,
+    0 24px 70px #0007;
+  isolation: isolate;
+}
+.table:before {
+  content: "";
+  position: absolute;
+  inset: 12px;
+  z-index: 0;
+  border: 1px solid #e5f5d830;
+  border-radius: 22px;
+  pointer-events: none;
+}
+.table:after {
+  content: "";
+  position: absolute;
+  top: 18%;
+  left: 20%;
+  z-index: 0;
+  width: 60%;
+  height: 50%;
+  border-radius: 50%;
+  background: #a8edbf1a;
+  filter: blur(60px);
+  pointer-events: none;
+}
+.table > * {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+.table-head {
+  grid-area: head;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 4px;
+  color: #e6f4e3b0;
+  font: 11px var(--mono);
+  letter-spacing: 0.12em;
+}
+.table-head .live {
+  color: var(--green);
+}
+.table-head i {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 7px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: blink 2s ease-in-out infinite;
+}
+
+/* 座位卡：信息牌 + Jev 判断 + 明牌 合成一个整体 */
+.seat {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #081a14c4;
+  box-shadow: 0 14px 34px #0005;
+  backdrop-filter: blur(10px);
+  transition:
+    border-color 0.25s,
+    box-shadow 0.25s;
+}
+.seat.north {
+  grid-area: left;
+  align-self: center;
+}
+.seat.west {
+  grid-area: right;
+  align-self: center;
+}
+.seat.east {
+  grid-area: eseat;
+  justify-self: center;
+  flex-direction: row;
+  align-items: stretch;
+  width: min(100%, 820px);
+  padding: 10px;
+}
+.seat.active {
+  border-color: #ffe8a9b0;
+  box-shadow:
+    0 0 0 4px #ffe8a91c,
+    0 0 36px #ffe8a93a,
+    0 14px 34px #0005;
+}
+.seat.active .avatar {
+  animation: seat-pulse 1.6s ease-in-out infinite;
+}
+
+.player-name {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+}
+.seat.east .player-name {
+  flex: 0 0 280px;
+  padding: 0 8px 0 4px;
+}
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 2px solid;
+  border-radius: 50%;
+  font: 600 16px var(--sans);
+}
+.avatar.blue {
+  color: var(--blue);
+  border-color: #a9d8f2aa;
+  background: #14364799;
+}
+.avatar.yellow {
+  color: var(--amber);
+  border-color: #f5d48caa;
+  background: #49351a88;
+}
+.avatar.red {
+  color: var(--red);
+  border-color: #ff9e8aaa;
+  background: #62231b99;
+}
+.plate-main {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.name-text {
+  overflow: hidden;
+  color: #fff8e1;
+  font: 600 17px var(--sans);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.plate-main small {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.role {
+  padding: 1px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--ink-soft);
+  background: #ffffff0a;
+  font-size: 11px;
+}
+.seat.landlord .role {
+  border-color: #ffe4a2;
+  color: #43301a;
+  background: linear-gradient(#ffe7a9, #efbd65);
+  font-weight: 600;
+}
+.count em {
+  color: var(--ink);
+  font: 500 13px var(--mono);
+  font-style: normal;
+}
+.score-line {
+  display: grid;
+  justify-items: end;
+  gap: 3px;
+  padding-left: 12px;
+  border-left: 1px solid var(--line-soft);
+  color: var(--muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
+.score-line em {
+  margin-left: 4px;
+  color: var(--amber);
+  font: 500 13px var(--mono);
+  font-style: normal;
+}
+
+.jev-card {
+  padding: 10px 12px;
+  border: 1px solid var(--line-soft);
+  border-radius: 12px;
+  background: #ffffff08;
+  transition: border-color 0.25s;
+}
+.jev-card > small {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--muted2);
+  font: 10px var(--mono);
+  letter-spacing: 0.08em;
+}
+.jev-action {
+  display: block;
+  color: var(--amber);
+  font: 600 15px var(--sans);
+}
+.jev-picks {
+  display: grid;
+  gap: 4px;
+  margin-top: 8px;
+}
+.jev-picks span {
+  overflow: hidden;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: #ffffff0d;
+  color: var(--ink-soft);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.jev-picks .pick-style {
+  color: var(--amber);
+}
+.jev-risk {
+  display: block;
+  margin-top: 7px;
+  color: var(--muted);
+  font: 11px var(--mono);
+}
+.jev-card.good {
+  border-color: #92e7bb55;
+}
+.jev-card.good .jev-action {
+  color: var(--green);
+}
+.jev-card.warn {
+  border-color: #ff8c7366;
+}
+.jev-card.warn .jev-action {
+  color: var(--red);
+}
+.seat.east .jev-card {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(96px, auto) minmax(0, 1fr) auto;
+  grid-template-areas:
+    "label picks risk"
+    "action picks risk";
+  gap: 2px 16px;
+  align-items: center;
+}
+.seat.east .jev-card > small {
+  grid-area: label;
+  align-self: end;
+  margin: 0;
+}
+.seat.east .jev-action {
+  grid-area: action;
+  align-self: start;
+}
+.seat.east .jev-picks {
+  grid-area: picks;
+  margin: 0;
+}
+.seat.east .jev-risk {
+  grid-area: risk;
+  margin: 0;
+}
+
+/* 牌面：统一 5:7 比例，重叠铺开 */
+.face-card,
+.mini-card,
+.played-cards .card,
+.kitty .card,
+.kitty .card-back {
+  display: block;
+  height: auto;
+  aspect-ratio: var(--card-ratio);
+  border-radius: 8px;
+  box-shadow:
+    0 0 0 1px #0000001f,
+    -3px 6px 12px #0006;
+  user-select: none;
+  transition: transform 0.18s ease;
+}
+.face-hand {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, var(--side-col));
+  grid-auto-rows: var(--side-row);
+  padding: 2px calc(var(--side-w) - var(--side-col)) calc(var(--side-w) * 1.4 - var(--side-row)) 0;
+}
+.face-hand:empty {
+  display: none;
+}
+.face-card {
+  width: var(--side-w);
+  border-radius: 6px;
+}
+.seat.east .face-hand {
+  display: none;
+}
+.face-card:hover,
+.mini-card:hover {
+  position: relative;
+  z-index: 5;
+  transform: translateY(-10px);
+}
+
+/* 中央牌区 */
+.felt {
+  grid-area: mid;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+}
+.rings {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(86%, 560px);
+  height: min(70%, 330px);
+  border: 1px solid #dff6df2e;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.rings:after {
+  content: "";
+  position: absolute;
+  inset: -28px -42px;
+  border: 1px dashed #dff6df1c;
+  border-radius: 50%;
+}
+.felt > :not(.rings) {
+  position: relative;
+}
+.kitty,
+.played {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+}
+.kitty > small,
+.played > small {
+  padding: 4px 12px;
+  border: 1px solid #e5f5d82e;
+  border-radius: 999px;
+  background: #0b201999;
+  color: #e5f5d8c8;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+}
+.kitty > div {
+  display: flex;
+  gap: 8px;
+}
+.kitty .card,
+.kitty .card-back {
+  width: var(--kitty-w);
+}
+.center {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  color: #e7f4e3a8;
+}
+.center i {
+  margin-bottom: 10px;
+  color: var(--amber);
+  font-size: 30px;
+  font-style: normal;
+  line-height: 0.8;
+  text-shadow: 0 0 22px #f5d48c88;
+}
+.center b {
+  color: #fff8e1;
+  font: 600 22px var(--sans);
+  letter-spacing: 0.02em;
+}
+.center small {
+  margin-top: 6px;
+  color: #dcebdd80;
+  font: 10px var(--mono);
+  letter-spacing: 0.16em;
+}
+.played-cards {
+  display: flex;
+  justify-content: center;
+  min-height: calc(var(--play-w) * 1.4);
+}
+.played-cards .card {
+  width: var(--play-w);
+  animation: card-in 0.28s ease-out both;
+}
+.played-cards .card + .card {
+  margin-left: 8px;
+}
+/* 牌多时再重叠，避免长顺子/飞机撑出牌区 */
+.played-cards:has(> :nth-child(6)) .card + .card {
+  margin-left: calc(var(--play-step) - var(--play-w));
+}
+.played-cards:has(> :nth-child(11)) .card + .card {
+  margin-left: calc(var(--play-step) * 0.7 - var(--play-w));
+}
+
+/* 本家手牌 */
+.hand-row {
+  grid-area: hand;
+  display: flex;
+  justify-content: safe center;
+  align-items: flex-end;
+  padding-top: 26px;
+}
+.hand-row > small {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  color: #e5f5d8b8;
+  font-size: 12px;
+  white-space: nowrap;
+  transform: translateX(-50%);
+}
+.mini-card {
+  flex: none;
+  width: var(--hand-w);
+}
+.mini-card + .mini-card {
+  margin-left: calc(var(--hand-step) - var(--hand-w));
+}
+
+@keyframes seat-pulse {
+  50% {
+    box-shadow: 0 0 0 6px #ffe8a92e;
+  }
+}
+@keyframes blink {
+  50% {
+    opacity: 0.35;
+  }
+}
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *:before,
+  *:after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

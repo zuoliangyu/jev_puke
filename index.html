@@ -12,7 +12,7 @@
       href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=IBM+Plex+Sans+SC:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=20260922-9" />
+    <link rel="stylesheet" href="styles.css?v=20260923-1" />
   </head>
   <body>
     <div class="shell">
@@ -21,35 +21,39 @@
           ><span class="logo">J</span
           ><span><b>JEV</b><em>地 主 牌 局 实 验 室</em></span></a
         >
+        <div class="stats">
+          <div><small>MODEL</small><b id="modelBadge">jev-1.13</b></div>
+          <div><small>TURN</small><b id="turnStat">01 / 54</b></div>
+          <div><small>STATUS</small><b id="gameStat">READY</b></div>
+        </div>
         <div class="meta">
           <i></i> LIVE REPLAY <span>SESSION <b id="session">LOCAL</b></span
-          ><button id="reset" aria-label="重新发牌">↺</button>
+          ><button id="reset" aria-label="重新发牌" title="重置牌桌">↺</button>
         </div>
       </header>
       <main id="top">
-        <section class="hero">
-          <div>
-            <small class="eyebrow">FULL GAME / 03 PLAYERS</small>
-            <h1>看一整局<br /><span>怎么落子。</span></h1>
-            <p>
-              每一回合都交给 Jev
-              判断，三位玩家的建议会随牌局一起推进，并留下完整的决策轨迹。
-            </p>
-          </div>
-          <div class="stats">
-            <div><small>MODEL</small><b id="modelBadge">jev-1.13</b></div>
-            <div><small>TURN</small><b id="turnStat">01 / 54</b></div>
-            <div><small>STATUS</small><b id="gameStat">READY</b></div>
-          </div>
-        </section>
         <section class="game-grid">
           <section class="table-col">
             <div class="table">
               <div class="table-head">
                 <span id="roundLabel">ROUND 01</span
-                ><span><i></i> LIVE REPLAY</span>
+                ><span class="live"><i></i> LIVE REPLAY</span>
               </div>
-              <div class="seat north">
+              <section class="seat north" aria-label="左岚座位">
+                <div class="player-name" data-player-name="north">
+                  <b class="avatar blue">左</b>
+                  <div class="plate-main">
+                    <strong class="name-text">左岚</strong>
+                    <small
+                      ><span class="role" id="northRole">待定</span
+                      ><span class="count"><em id="northCount">17</em> 张</span></small
+                    >
+                  </div>
+                  <small class="score-line"
+                    ><span>本局 <em id="northRoundScore">—</em></span
+                    ><span>累计 <em id="northTotalScore">0</em></span></small
+                  >
+                </div>
                 <div class="jev-card" data-jev="north">
                   <small>JEV · 左岚</small><b class="jev-action">等待判断</b>
                   <div class="jev-picks">
@@ -58,24 +62,23 @@
                   </div>
                   <span class="jev-risk">风险 —</span>
                 </div>
-                <b class="avatar blue">北</b
-                ><span class="player-name" data-player-name="north"
-                  ><strong class="name-text">左岚</strong
-                  ><small
-                    ><span id="northRole">待定</span> ·
-                    <em id="northCount">17</em> 张</small
-                  ><small class="score-line"
-                    >本局 <em id="northRoundScore">—</em> · 累计
-                    <em id="northTotalScore">0</em></small
-                  ></span
-                >
-                <div
-                  id="northHand"
-                  class="face-hand"
-                  aria-label="左岚明牌"
-                ></div>
-              </div>
-              <div class="seat west">
+                <div id="northHand" class="face-hand" aria-label="左岚明牌"></div>
+              </section>
+              <section class="seat west" aria-label="小符座位">
+                <div class="player-name" data-player-name="west">
+                  <b class="avatar yellow">小</b>
+                  <div class="plate-main">
+                    <strong class="name-text">小符</strong>
+                    <small
+                      ><span class="role" id="westRole">待定</span
+                      ><span class="count"><em id="westCount">17</em> 张</span></small
+                    >
+                  </div>
+                  <small class="score-line"
+                    ><span>本局 <em id="westRoundScore">—</em></span
+                    ><span>累计 <em id="westTotalScore">0</em></span></small
+                  >
+                </div>
                 <div class="jev-card" data-jev="west">
                   <small>JEV · 小符</small><b class="jev-action">等待判断</b>
                   <div class="jev-picks">
@@ -84,24 +87,37 @@
                   </div>
                   <span class="jev-risk">风险 —</span>
                 </div>
-                <b class="avatar yellow">南</b
-                ><span class="player-name" data-player-name="west"
-                  ><strong class="name-text">小符</strong
-                  ><small
-                    ><span id="westRole">待定</span> ·
-                    <em id="westCount">17</em> 张</small
-                  ><small class="score-line"
-                    >本局 <em id="westRoundScore">—</em> · 累计
-                    <em id="westTotalScore">0</em></small
-                  ></span
-                >
-                <div
-                  id="westHand"
-                  class="face-hand"
-                  aria-label="小符明牌"
-                ></div>
+                <div id="westHand" class="face-hand" aria-label="小符明牌"></div>
+              </section>
+              <div class="felt">
+                <div class="rings"></div>
+                <div id="kitty" class="kitty" hidden>
+                  <small>底牌</small>
+                  <div></div>
+                </div>
+                <div id="center" class="center">
+                  <i>◇</i><b>等待发牌</b><small>JEV STRUCTURED TABLE</small>
+                </div>
+                <div id="played" class="played">
+                  <small>本回合出牌</small>
+                  <div class="played-cards"></div>
+                </div>
               </div>
-              <div class="seat east">
+              <section class="seat east" aria-label="长东座位">
+                <div class="player-name" data-player-name="east">
+                  <b class="avatar red">长</b>
+                  <div class="plate-main">
+                    <strong class="name-text">长东</strong>
+                    <small
+                      ><span class="role" id="eastRole">待定</span
+                      ><span class="count"><em id="eastCount">17</em> 张</span></small
+                    >
+                  </div>
+                  <small class="score-line"
+                    ><span>本局 <em id="eastRoundScore">—</em></span
+                    ><span>累计 <em id="eastTotalScore">0</em></span></small
+                  >
+                </div>
                 <div class="jev-card" data-jev="east">
                   <small>JEV · 长东</small><b class="jev-action">等待判断</b>
                   <div class="jev-picks">
@@ -110,43 +126,16 @@
                   </div>
                   <span class="jev-risk">风险 —</span>
                 </div>
-                <b class="avatar red">你</b
-                ><span class="player-name" data-player-name="east"
-                  ><strong class="name-text">长东</strong
-                  ><small
-                    ><span id="eastRole">待定</span> ·
-                    <em id="eastCount">17</em> 张</small
-                  ><small class="score-line"
-                    >本局 <em id="eastRoundScore">—</em> · 累计
-                    <em id="eastTotalScore">0</em></small
-                  ></span
-                >
-                <div
-                  id="eastHand"
-                  class="face-hand"
-                  aria-label="长东明牌"
-                ></div>
-              </div>
-              <div class="rings"></div>
-              <div id="center" class="center">
-                <i>◇</i><b>等待发牌</b><small>JEV STRUCTURED TABLE</small>
-              </div>
-              <div id="kitty" class="kitty" hidden>
-                <small>底牌</small>
-                <div></div>
-              </div>
-              <div id="played" class="played">
-                <small>本回合出牌</small>
-                <div class="played-cards"></div>
-              </div>
+                <div id="eastHand" class="face-hand" aria-label="长东明牌"></div>
+              </section>
               <div id="hand" class="hand-row">
                 <small>长东手牌 · 17 张</small>
               </div>
             </div>
-            <div class="caption">
-              <span>● 牌局状态同步</span><span id="hint">点击“开始牌局”</span>
-            </div>
             <div class="controls">
+              <p class="caption">
+                <span>● 牌局状态同步</span><span id="hint">点击“开始牌局”</span>
+              </p>
               <button id="deal" class="primary">✦ 开始牌局</button
               ><button id="step">下一回合 →</button
               ><button id="auto">自动播放</button
@@ -154,6 +143,13 @@
             </div>
           </section>
           <aside class="right">
+            <div class="usage">
+              <div>
+                <small>TURN</small><b id="turnUsage">—</b><em>index</em>
+              </div>
+              <div><small>LATENCY</small><b id="latency">—</b><em>ms</em></div>
+              <div><small>MODE</small><b id="cost">DEMO</b><em>source</em></div>
+            </div>
             <section class="panel">
               <div class="ph">
                 <div>
@@ -235,13 +231,6 @@
                 </p>
               </div>
             </details>
-            <div class="usage">
-              <div>
-                <small>TURN</small><b id="turnUsage">—</b><em>index</em>
-              </div>
-              <div><small>LATENCY</small><b id="latency">—</b><em>ms</em></div>
-              <div><small>MODE</small><b id="cost">DEMO</b><em>source</em></div>
-            </div>
             <section class="panel config">
               <button id="configToggle">
                 <span>⚙　连接设置</span><b>+</b>
@@ -310,6 +299,6 @@
         >
       </footer>
     </div>
-    <script type="module" src="src/main.js?v=20260922-10"></script>
+    <script type="module" src="src/main.js?v=20260923-1"></script>
   </body>
 </html>

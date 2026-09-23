@@ -108,6 +108,10 @@ export function syncNames() {
       `[data-player-name="${id}"] .name-text`,
     );
     if (nameElement) nameElement.textContent = value;
+    const avatar = document.querySelector(
+      `[data-player-name="${id}"] .avatar`,
+    );
+    if (avatar) avatar.textContent = value.slice(0, 1);
     const jevName = document.querySelector(`[data-jev="${id}"] small`);
     if (jevName) jevName.textContent = `JEV · ${value}`;
     const handElement = $("#" + id + "Hand");
@@ -117,6 +121,9 @@ export function syncNames() {
 
 export function renderRoles() {
   ids.forEach((id) => {
+    document
+      .querySelector(".seat." + id)
+      ?.classList.toggle("landlord", state.landlord === id);
     const role = $("#" + id + "Role");
     if (role)
       role.textContent = state.landlord
