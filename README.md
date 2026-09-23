@@ -55,6 +55,8 @@ node server.mjs
 - `src/api/jev.js`：Jev 请求、响应归一化和本地演示模式。
 - `src/ui/render.js`：牌桌、Jev 卡、日志和积分面板渲染。
 - `styles/`：基础、牌桌、面板、响应式和桌面覆盖样式；根目录的 `styles.css` 只是导入入口。
+- `img/cards_png/`：54 张静态牌面；牌局用 PNG 渲染玩家明牌、出牌和底牌。叫分阶段用 `img/card_back.png` 显示三张盖住的底牌。
+- `img/cards_gif/` 和 `img/deck_preview.png`：动态牌面素材及预览资源，当前牌局不加载 GIF，避免大量牌面同时播放动画。
 
 旧的单文件 `app.js` 已移除，浏览器直接加载 ES Module 入口。
 

@@ -3,6 +3,18 @@ import { $, esc, time } from "../core/dom.js";
 import { state } from "../core/state.js";
 import { cardRank, sorted } from "../game/cards.js";
 
+const suitAsset = { "♠": "spade", "♥": "heart", "♦": "diamond", "♣": "club" };
+
+function cardImage(card) {
+  const name =
+    card === "小王"
+      ? "joker_small"
+      : card === "大王"
+        ? "joker_big"
+        : `${suitAsset[card[0]]}_${card.slice(1)}`;
+  return `/img/cards_png/${name}.png`;
+}
+
 export function readBaseScore() {
   const input = $("#baseScore");
   const value = Math.round(Number(input?.value) || 1);
@@ -161,9 +173,8 @@ export function renderFaceHands() {
     const element = $("#" + id + "Hand");
     if (!element) return;
     element.innerHTML = sorted(player.hand)
-      .map(
-        (card) =>
-          `<span class="face-card ${/[♥♦]/.test(card) ? "red" : ""}">${esc(card)}</span>`,
+      .map((card) =>
+        `<img class="face-card" src="${cardImage(card)}" alt="${esc(card)}" draggable="false">`,
       )
       .join("");
   });
@@ -174,9 +185,8 @@ export function renderHand() {
   const hand = sorted(player.hand);
   $("#hand").innerHTML =
     hand
-      .map(
-        (card) =>
-          `<span class="mini-card ${/[♥♦]/.test(card) ? "red" : ""}">${esc(card)}</span>`,
+      .map((card) =>
+        `<img class="mini-card" src="${cardImage(card)}" alt="${esc(card)}" draggable="false">`,
       )
       .join("") +
     `<small>${esc(player.name)}手牌 · ${player.hand.length} 张</small>`;
@@ -185,9 +195,8 @@ export function renderHand() {
 export function renderPlayed(play, id) {
   const cards = play?.cards || [];
   $("#played").querySelector(".played-cards").innerHTML = cards
-    .map(
-      (card) =>
-        `<span class="card ${/[♥♦]/.test(card) ? "red" : ""}">${esc(card)}</span>`,
+    .map((card) =>
+      `<img class="card" src="${cardImage(card)}" alt="${esc(card)}" draggable="false">`,
     )
     .join("");
   $("#played").querySelector("small").textContent = play
@@ -197,17 +206,24 @@ export function renderPlayed(play, id) {
 
 export function renderKitty() {
   const element = $("#kitty");
-  if (!state.kitty.length || state.phase === "bid") {
+  if (!state.kitty.length) {
     element.hidden = true;
     return;
   }
   element.hidden = false;
-  element.querySelector("div").innerHTML = state.kitty
-    .map(
-      (card) =>
-        `<span class="card ${/[♥♦]/.test(card) ? "red" : ""}">${esc(card)}</span>`,
-    )
-    .join("");
+  element.querySelector("div").innerHTML =
+    state.phase === "bid"
+      ? state.kitty
+          .map(
+            () =>
+              '<img class="card-back" src="/img/card_back.png" alt="底牌（背面）" draggable="false">',
+          )
+          .join("")
+      : state.kitty
+          .map((card) =>
+            `<img class="card" src="${cardImage(card)}" alt="${esc(card)}" draggable="false">`,
+          )
+          .join("");
 }
 
 export function fallbackJudgement(id) {

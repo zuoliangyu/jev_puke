@@ -194,6 +194,15 @@
   }
 }
 
+@media (max-width: 420px) {
+  .hand-row .mini-card {
+    flex: 0 0 23px;
+    width: 23px;
+    height: 34px;
+    margin-left: -8px;
+  }
+}
+
 /* Large desktop table pass (1440px+): keep the decision rail visible and use the first viewport more deliberately. */
 @media (min-width: 1440px) {
   .shell {

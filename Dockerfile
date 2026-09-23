@@ -5,6 +5,7 @@ WORKDIR /app
 COPY package.json server.mjs index.html styles.css README.md ./
 COPY src ./src
 COPY styles ./styles
+COPY img ./img
 
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0

@@ -610,6 +610,23 @@ footer a {
   color: #8ea89a;
   font: 9px/1.45 var(--mono);
 }
+.face-hand img.face-card,
+.hand-row img.mini-card,
+.played-cards img.card,
+.kitty img.card,
+.kitty img.card-back {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  object-fit: fill;
+}
+.kitty img.card-back {
+  width: 34px;
+  height: 48px;
+  border-radius: 6px;
+  box-shadow: 0 7px 12px #0005;
+}
 @keyframes seat-pulse {
   50% {
     transform: scale(1.035);
