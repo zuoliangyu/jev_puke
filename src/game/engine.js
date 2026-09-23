@@ -247,8 +247,8 @@ export function applyPlay() {
     );
     registerBomb(play);
   } else {
+    // 过牌不改动桌面，中间继续显示上一手牌
     state.passCount++;
-    renderPlayed(state.lastPlay, state.lastPlay?.player || id);
     log(`<b>${esc(player.name)}</b> 过牌`);
     if (state.passCount >= 2) {
       state.lastPlay = null;

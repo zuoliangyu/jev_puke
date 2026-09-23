@@ -201,7 +201,12 @@ export function renderHand() {
 
 export function renderPlayed(play, id) {
   const cards = play?.cards || [];
-  $("#played").querySelector(".played-cards").innerHTML = cards
+  const container = $("#played").querySelector(".played-cards");
+  // 同一手牌不重建 DOM，避免入场动画重播
+  const key = play ? `${id}:${cards.join(",")}` : "";
+  if (container.dataset.key === key) return;
+  container.dataset.key = key;
+  container.innerHTML = cards
     .map((card) =>
       `<img class="card" src="${cardImage(card)}" alt="${esc(card)}" draggable="false">`,
     )
