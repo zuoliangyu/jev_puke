@@ -216,6 +216,11 @@
   color: var(--ink);
   font-weight: 500;
 }
+.entry em {
+  margin-left: 2px;
+  color: var(--muted2);
+  font-style: normal;
+}
 .entry.ok span {
   color: var(--green);
 }

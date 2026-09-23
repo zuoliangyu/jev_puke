@@ -223,10 +223,22 @@ function settleScore(winnerId, spring) {
   );
 }
 
-export function applyPlay() {
+// 日志里标明这一手由谁决定
+const playSource = {
+  jev: "按 Jev 建议",
+  local: "本地规则",
+  finish: "一手出完",
+  teammate: "不压队友",
+  none: "要不起",
+};
+
+export function applyPlay(data = {}) {
   const id = ids[state.current];
   const player = state.players[id];
-  const play = choosePlay(id);
+  const play = choosePlay(id, data[id]?.hint);
+  const source = playSource[play.source]
+    ? ` · <em>${playSource[play.source]}</em>`
+    : "";
   if (play.cards.length) {
     play.cards.forEach((card) => {
       const index = player.hand.indexOf(card);
@@ -243,13 +255,13 @@ export function applyPlay() {
     state.passCount = 0;
     renderPlayed(play, id);
     log(
-      `<b>${esc(player.name)}</b> 出牌 · ${typeLabel[play.type] || play.type} · ${play.cards.join("、")}`,
+      `<b>${esc(player.name)}</b> 出牌 · ${typeLabel[play.type] || play.type} · ${play.cards.join("、")}${source}`,
     );
     registerBomb(play);
   } else {
     // 过牌不改动桌面，中间继续显示上一手牌
     state.passCount++;
-    log(`<b>${esc(player.name)}</b> 过牌`);
+    log(`<b>${esc(player.name)}</b> 过牌${source}`);
     if (state.passCount >= 2) {
       state.lastPlay = null;
       state.passCount = 0;
@@ -368,8 +380,8 @@ export async function runPhaseTurn() {
     const data = await runJev();
     applyBid(data);
   } else if (state.phase === "play") {
-    await runJev();
-    applyPlay();
+    const data = await runJev();
+    applyPlay(data);
   }
   if (state.auto && state.playing) state.timer = setTimeout(runPhaseTurn, 950);
 }

@@ -2,26 +2,58 @@ import { ids, typeLabel } from "../core/constants.js";
 import { $, esc } from "../core/dom.js";
 import { state } from "../core/state.js";
 import { cardRank, groupRanks, rank, sorted } from "../game/cards.js";
-import { choosePlay } from "../game/rules.js";
+import { choosePlay, isTeammate } from "../game/rules.js";
 
 export function buildPayload(id = ids[state.current]) {
   if (!ids.includes(id)) throw new Error(`未知玩家：${id}`);
   const players = state.players;
   const player = players[id];
   const currentId = ids[state.current];
-  const last = state.lastPlay
-    ? `${players[state.lastPlay.player]?.name || "玩家"} ${state.lastPlay.type} ${state.lastPlay.cards.join("")}`
-    : "无";
+  const landlord = state.landlord;
+  const relation = (otherId) =>
+    otherId === id
+      ? "你"
+      : !landlord
+        ? "对手"
+        : isTeammate(id, otherId)
+          ? "农民·你的队友"
+          : otherId === landlord
+            ? "地主·你的对手"
+            : "农民·你的对手";
   const visiblePlayers = ids
     .map((otherId) => {
       const other = players[otherId];
       if (otherId === id) {
-        return `${other.name}（你，${other.hand.length}张）：${sorted(other.hand).join("、")}`;
+        return `${other.name}（你${landlord ? (id === landlord ? "·地主" : "·农民") : ""}，${other.hand.length}张）：${sorted(other.hand).join("、")}`;
       }
-      return `${other.name}（${otherId === state.landlord ? "地主" : "对手"}，仅知手牌数量 ${other.hand.length}张）`;
+      return `${other.name}（${relation(otherId)}，仅知手牌数量 ${other.hand.length}张）`;
     })
     .join("；");
-  const stateText = `你是${player.name}（玩家 ${id}）。阶段：${state.phase === "bid" ? "叫地主" : "出牌"}。回合：${state.turn}。当前玩家：${players[currentId].name}。玩家信息：${visiblePlayers}。最近公开动作：${last}。叫分记录：${state.bidHistory.map((item) => item.name + " " + item.bid).join("、") || "无"}。当前最高叫分：${state.highestBid || 0} 分。${state.phase === "bid" ? "叫地主只能选择高于当前最高分的 1-3 分，或选择不叫。" : `地主是${state.landlord ? players[state.landlord].name : "尚未产生"}，当前牌权公开信息如上。`} 你只能根据自己的完整手牌和公开信息作答，绝对不要假设或输出其他玩家的具体牌面。遵循斗地主牌型规则：单张、对子、三张、三带一、三带二、顺子、连对、飞机、四带二、炸弹、王炸。`;
+
+  const free = !state.lastPlay || state.passCount >= 2;
+  const lastBy = state.lastPlay?.player;
+  const last = state.lastPlay
+    ? `${players[lastBy]?.name || "玩家"}（${relation(lastBy)}）打出 ${typeLabel[state.lastPlay.type] || state.lastPlay.type} ${state.lastPlay.cards.join("")}${state.passCount ? `，之后 ${state.passCount} 家过牌` : ""}`
+    : "无";
+  const teammates = landlord
+    ? ids.filter((otherId) => isTeammate(id, otherId))
+    : [];
+  const farmers = ids.filter((otherId) => otherId !== landlord);
+
+  // 阵营与配合原则：农民之间是队友，决定了该不该压上一手
+  const teamText = !landlord
+    ? "阵营规则：叫到地主的人拿走底牌，一人对抗另外两家；另外两家是农民，互为队友，任意一名农民先出完则两名农民都获胜。"
+    : id === landlord
+      ? `阵营规则：你是地主，一人对抗 ${farmers.map((otherId) => players[otherId].name).join("、")} 两名农民；他们互为队友，会配合压你。你先出完才获胜，任意一名农民先出完你就输。`
+      : `阵营规则：你是农民，${teammates.map((otherId) => players[otherId].name).join("、")} 是你的队友，${players[landlord].name} 是地主、你们共同的对手。你或队友任意一人先出完，你们都获胜。配合原则：队友打出的牌如果已经够大，一般选择过牌让队友继续走，不要去压队友；地主的牌要尽量压住，地主手牌很少时更要顶住，必要时用炸弹。`;
+  const turnText =
+    state.phase !== "play"
+      ? ""
+      : free
+        ? "现在牌权在你，必须主动出牌，不能过牌。"
+        : `现在需要跟牌：只能用同牌型更大的牌或炸弹压过「${last}」，也可以过牌。${lastBy && isTeammate(id, lastBy) ? "这手牌是你的队友打的。" : ""}`;
+
+  const stateText = `你是${player.name}（玩家 ${id}）。阶段：${state.phase === "bid" ? "叫地主" : "出牌"}。回合：${state.turn}。当前玩家：${players[currentId].name}。玩家信息：${visiblePlayers}。${teamText}最近公开动作：${last}。${turnText}叫分记录：${state.bidHistory.map((item) => item.name + " " + item.bid).join("、") || "无"}。当前最高叫分：${state.highestBid || 0} 分。${state.phase === "bid" ? "叫地主只能选择高于当前最高分的 1-3 分，或选择不叫。" : ""} 你只能根据自己的完整手牌和公开信息作答，绝对不要假设或输出其他玩家的具体牌面。遵循斗地主牌型规则：单张、对子、三张、三带一、三带二、顺子、连对、飞机、四带二、炸弹、王炸。`;
   const questions = {};
 
   if (state.phase === "bid") {
@@ -38,7 +70,11 @@ export function buildPayload(id = ids[state.current]) {
   } else {
     questions[`${id}_play`] = {
       type: "choice",
-      instructions: "判断你当前应该打什么牌型。",
+      instructions: free
+        ? "牌权在你，判断你应该主动打出什么牌型，不能选择 pass。"
+        : lastBy && isTeammate(id, lastBy)
+          ? "上一手是你的队友打的。判断你是否要压：通常应选择 pass 让队友继续走牌，只有你能借此一口气出完或明显更有利时才出牌。"
+          : "判断你应该用什么牌型压过上一手，压不过或不值得压时选择 pass。",
       criteria: {
         single: "单张或拆牌抢节奏。",
         pair: "对子或连续对子保持牌权。",
@@ -50,7 +86,7 @@ export function buildPayload(id = ids[state.current]) {
     };
     questions[`${id}_style`] = {
       type: "choice",
-      instructions: "判断你当前的进攻方式。",
+      instructions: "结合你和队友的局面，判断你当前的进攻方式。",
       criteria: {
         attack: "主动抢先手。",
         pressure: "压制对手出牌。",
@@ -138,7 +174,9 @@ export function demoJudgement() {
               ? id === state.landlord
                 ? "主动抢先手"
                 : "跟牌压制"
-              : "等待牌权",
+              : play.source === "teammate"
+                ? "让队友走牌"
+                : "等待牌权",
             risk: player.hand.length < 5 ? "低风险" : "中风险",
             confidence: player.hand.length < 5 ? "88%" : "65%",
           }
@@ -190,6 +228,7 @@ export function normalize(result, id = ids[state.current]) {
     hold: "保留牌型",
   };
   return {
+    hint: { choice: play.choice, style: style.choice },
     action: playLabels[play.choice] || "等待出牌",
     play: playLabels[play.choice] || "—",
     style: styleLabels[style.choice] || "根据牌面调整",
