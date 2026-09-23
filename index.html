@@ -12,7 +12,7 @@
       href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=IBM+Plex+Sans+SC:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=20260923-1" />
+    <link rel="stylesheet" href="styles.css?v=20260923-2" />
   </head>
   <body>
     <div class="shell">
@@ -236,12 +236,29 @@
                 <span>⚙　连接设置</span><b>+</b>
               </button>
               <div id="config" hidden>
-                <label>ENDPOINT</label
+                <label for="provider">服务商</label
+                ><select id="provider">
+                  <option value="eflow">E-FlowCode 中转</option>
+                  <option value="typesafe">TypeSafe 官方</option>
+                  <option value="custom">自定义</option></select
+                ><label for="endpoint">ENDPOINT</label
                 ><input
                   id="endpoint"
                   value="https://www.e-flowcode.cc/v1/systemone"
-                /><label>MODEL</label
-                ><input id="model" value="jev-1.13" /><label
+                /><label for="model"
+                  >MODEL <em id="modelsStatus" role="status" aria-live="polite"></em></label
+                >
+                <div class="model-row">
+                  <input id="model" value="jev-1.13" list="modelOptions" /><button
+                    id="fetchModels"
+                    class="settings-save"
+                    type="button"
+                  >
+                    获取模型
+                  </button>
+                  <datalist id="modelOptions"></datalist>
+                </div>
+                <label
                   >底分 <em>1-100</em></label
                 ><input
                   id="baseScore"
@@ -280,8 +297,8 @@
                   ></span>
                 </div>
                 <p>
-                  无 Key 时运行本地完整牌局；配置 Key 后，每回合向 Jev
-                  发送三位玩家的问题。
+                  无 Key 时运行本地完整牌局。填入对应服务商的 Key 后，请求经本地代理发往上方
+                  Endpoint；E-FlowCode 与 TypeSafe 官方的 Key 和模型名互不通用。
                 </p>
               </div>
             </section>
@@ -299,6 +316,6 @@
         >
       </footer>
     </div>
-    <script type="module" src="src/main.js?v=20260923-1"></script>
+    <script type="module" src="src/main.js?v=20260923-2"></script>
   </body>
 </html>

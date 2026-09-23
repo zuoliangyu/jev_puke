@@ -372,7 +372,8 @@
   font-style: normal;
   letter-spacing: 0;
 }
-.config input {
+.config input,
+.config select {
   display: block;
   width: calc(100% - 36px);
   height: 36px;
@@ -385,7 +386,47 @@
   background: #0004;
   font: 12px var(--mono);
 }
-.config input:focus {
+.config select {
+  appearance: none;
+  cursor: pointer;
+  background:
+    linear-gradient(45deg, transparent 50%, var(--amber) 50%) calc(100% - 17px)
+      50% / 5px 5px no-repeat,
+    linear-gradient(-45deg, transparent 50%, var(--amber) 50%) calc(100% - 12px)
+      50% / 5px 5px no-repeat,
+    #0004;
+}
+.config select option {
+  color: var(--ink);
+  background: #0a1d17;
+}
+.config .model-row {
+  display: flex;
+  gap: 8px;
+  padding: 0 18px;
+}
+.config .model-row input {
+  flex: 1;
+  width: auto;
+  min-width: 0;
+  margin: 0;
+}
+.config .model-row .settings-save {
+  flex: none;
+  width: auto;
+  display: block;
+  padding: 0 14px;
+  font: 12px var(--sans);
+}
+.config .model-row .settings-save:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+.config label em.error {
+  color: var(--red);
+}
+.config input:focus,
+.config select:focus {
   border-color: #f5d48cb8;
   box-shadow: 0 0 0 3px #f5d48c14;
 }

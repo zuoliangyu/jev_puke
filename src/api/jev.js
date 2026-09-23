@@ -1,5 +1,5 @@
 import { ids, typeLabel } from "../core/constants.js";
-import { $ } from "../core/dom.js";
+import { $, esc } from "../core/dom.js";
 import { state } from "../core/state.js";
 import { cardRank, groupRanks, rank, sorted } from "../game/cards.js";
 import { choosePlay } from "../game/rules.js";
@@ -218,10 +218,11 @@ export async function loadApiStatus() {
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const data = await response.json();
     state.apiReady = Boolean(data.live);
-    if (data.model) {
-      $("#modelBadge").textContent = data.model;
+    // 服务端模型只对应 JEV_TARGET（默认 E-FlowCode），别覆盖官方 / 自定义的模型名
+    if (data.model && $("#provider").value === "eflow") {
       $("#model").value = data.model;
     }
+    $("#modelBadge").textContent = $("#model").value.trim() || "—";
     updateApiMode();
     return state.apiReady;
   } catch {
@@ -240,11 +241,89 @@ export function updateApiMode() {
       : "DEMO";
 }
 
+// 两家服务的 Key 与模型名互不通用：官方用 jev-latest，E-FlowCode 用 jev-1.13。
+export const providers = {
+  eflow: {
+    endpoint: "https://www.e-flowcode.cc/v1/systemone",
+    model: "jev-1.13",
+  },
+  typesafe: {
+    endpoint: "https://api.typesafe.ai/v1/systemone",
+    model: "jev-latest",
+  },
+};
+
+export function applyProvider(id) {
+  const preset = providers[id];
+  if (!preset) return;
+  $("#endpoint").value = preset.endpoint;
+  $("#model").value = preset.model;
+  $("#modelBadge").textContent = preset.model;
+  $("#modelOptions").innerHTML = "";
+  setModelsStatus("");
+}
+
+export function syncProviderFromEndpoint() {
+  const endpoint = $("#endpoint").value.trim();
+  const match = Object.entries(providers).find(
+    ([, preset]) => preset.endpoint === endpoint,
+  );
+  $("#provider").value = match ? match[0] : "custom";
+}
+
+function setModelsStatus(text, error = false) {
+  const element = $("#modelsStatus");
+  element.textContent = text;
+  element.className = error ? "error" : "";
+}
+
+function localUrl(path) {
+  return location.protocol === "file:" ? `http://127.0.0.1:4173${path}` : path;
+}
+
+export async function fetchModels() {
+  const button = $("#fetchModels");
+  const key = $("#key").value.trim();
+  const endpoint = $("#endpoint").value.trim();
+  button.disabled = true;
+  setModelsStatus("获取中…");
+  try {
+    const response = await fetch(localUrl("/api/models"), {
+      headers: {
+        ...(key ? { Authorization: `Bearer ${key}`, "X-Jev-Target": endpoint } : {}),
+      },
+      cache: "no-store",
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok)
+      throw Error(`HTTP ${response.status} · ${data?.error?.message || response.statusText}`);
+    const models = data.models || [];
+    if (!models.length) throw Error("接口未返回可用模型");
+
+    $("#modelOptions").innerHTML = models
+      .map(
+        (item) =>
+          `<option value="${esc(item.id)}">${esc(item.description || item.id)}</option>`,
+      )
+      .join("");
+    const current = $("#model").value.trim();
+    if (!models.some((item) => item.id === current)) {
+      $("#model").value = models[0].id;
+      $("#modelBadge").textContent = models[0].id;
+    }
+    setModelsStatus(`${models.length} 个可用`);
+    return models;
+  } catch (error) {
+    setModelsStatus(error.message, true);
+    throw error;
+  } finally {
+    button.disabled = false;
+  }
+}
+
 function resolveProxy() {
   const configuredProxy = $("#proxy").value.trim();
-  return configuredProxy === "/api/jev" && location.protocol === "file:"
-    ? "http://127.0.0.1:4173/api/jev"
-    : configuredProxy;
+  return configuredProxy === "/api/jev" ? localUrl("/api/jev") : configuredProxy;
 }
 
 export function getRequestInfo() {
@@ -258,7 +337,16 @@ export function getRequestInfo() {
   };
 }
 
-async function requestOne(id, target, key) {
+// E-FlowCode 返回 {error:{message}}，TypeSafe 官方返回 {detail:{message}} 或 {detail:"..."}
+function errorMessage(payload) {
+  return (
+    payload?.error?.message ||
+    payload?.detail?.message ||
+    (typeof payload?.detail === "string" ? payload.detail : "")
+  );
+}
+
+async function requestOne(id, target, key, endpoint) {
   const controller = new AbortController();
   const timeout = window.setTimeout(() => controller.abort(), 25_000);
   let response;
@@ -268,6 +356,10 @@ async function requestOne(id, target, key) {
       headers: {
         "Content-Type": "application/json",
         ...(key ? { Authorization: `Bearer ${key}` } : {}),
+        // 经本地代理时告诉它真正的上游；直连上游时不需要这个头
+        ...(key && endpoint && target !== endpoint
+          ? { "X-Jev-Target": endpoint }
+          : {}),
       },
       body: JSON.stringify(buildPayload(id)),
       signal: controller.signal,
@@ -288,7 +380,7 @@ async function requestOne(id, target, key) {
   }
   if (!response.ok) {
     throw Error(
-      `${id} HTTP ${response.status} · ${parsed?.error?.message || response.statusText}`,
+      `${id} HTTP ${response.status} · ${errorMessage(parsed) || response.statusText}`,
     );
   }
   return parsed;
@@ -319,7 +411,12 @@ export async function requestJev() {
     };
   }
 
-  const result = await requestOne(currentId, target, key);
+  const result = await requestOne(
+    currentId,
+    target,
+    key,
+    $("#endpoint").value.trim(),
+  );
   return {
     result,
     data: { [currentId]: normalize(result, currentId) },

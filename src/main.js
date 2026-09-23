@@ -1,7 +1,13 @@
-import { $ } from "./core/dom.js";
+import { $, esc } from "./core/dom.js";
 import { loadSettings, saveSettings } from "./core/settings.js";
 import { state } from "./core/state.js";
-import { loadApiStatus, updateApiMode } from "./api/jev.js";
+import {
+  applyProvider,
+  fetchModels,
+  loadApiStatus,
+  syncProviderFromEndpoint,
+  updateApiMode,
+} from "./api/jev.js";
 import { deal, resetView, runPhaseTurn } from "./game/engine.js";
 import { log, resetScore, syncNames } from "./ui/render.js";
 
@@ -62,6 +68,19 @@ $("#saveSettings").addEventListener("click", () => {
 });
 
 $("#key").addEventListener("input", updateApiMode);
+$("#provider").addEventListener("change", (event) =>
+  applyProvider(event.target.value),
+);
+$("#endpoint").addEventListener("input", syncProviderFromEndpoint);
+$("#model").addEventListener("input", (event) => {
+  $("#modelBadge").textContent = event.target.value.trim() || "—";
+});
+$("#fetchModels").addEventListener("click", () =>
+  fetchModels().then(
+    (models) => log(`<b>模型列表</b> · ${models.map((item) => item.id).join("、")}`, "ok"),
+    (error) => log(`<b>获取模型失败</b> · ${esc(error.message)}`, "err"),
+  ),
+);
 
 $("#session").textContent =
   "LOCAL-" + Math.random().toString(36).slice(2, 6).toUpperCase();
@@ -75,6 +94,7 @@ $("#baseScore")?.addEventListener("input", () => {
 });
 
 loadSettings();
+syncProviderFromEndpoint();
 syncNames();
 resetView();
 loadApiStatus();

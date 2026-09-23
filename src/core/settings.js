@@ -2,6 +2,7 @@ import { $ } from "./dom.js";
 
 const STORAGE_KEY = "jev-landlords-settings-v1";
 const FIELD_IDS = [
+  "provider",
   "endpoint",
   "model",
   "baseScore",

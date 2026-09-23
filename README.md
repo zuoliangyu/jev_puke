@@ -10,7 +10,7 @@
 
 ## 本地运行
 
-无需安装依赖。Windows 用户可以双击 `start.bat`，或在 PowerShell 中运行 `./start.ps1`；Linux、macOS 和 WSL 用户运行 `./start.sh`。脚本会检查 Node.js 版本、启动本地服务，并默认打开浏览器：
+无需安装依赖。Windows 用户在 PowerShell 中运行 `./start.ps1`；Linux、macOS 和 WSL 用户运行 `./start.sh`。脚本会检查 Node.js 版本、启动本地服务，并默认打开浏览器：
 
 ```powershell
 ./start.ps1
@@ -37,6 +37,19 @@ node server.mjs
 - Model：`jev-1.13`
 - 请求类型：同步 `POST JSON`
 - 本地代理：`/api/jev`
+
+### 切换服务商与获取模型
+
+“连接设置”里可以选择服务商，切换时会同时填好 Endpoint 和默认模型：
+
+| 服务商 | Endpoint | 默认模型 |
+| --- | --- | --- |
+| E-FlowCode 中转 | `https://www.e-flowcode.cc/v1/systemone` | `jev-1.13` |
+| TypeSafe 官方 | `https://api.typesafe.ai/v1/systemone` | `jev-latest`（另有 `jev-preview`） |
+
+两家的 Key 和模型名互不通用：官方 Key 发到 E-FlowCode 会返回 `401 Invalid token`，`jev-1.13` 发到官方会返回 `Unknown model`。点击 MODEL 旁的“获取模型”会经本地 `/api/models` 调用上游的 `/v1/models`，并把结果放进模型下拉建议里。
+
+页面填了 Key 时，本地代理按请求头 `X-Jev-Target` 转发到页面选择的 Endpoint；目标主机必须在白名单内（E-FlowCode、`api.typesafe.ai` 和 `JEV_TARGET` 的主机），其他主机用逗号分隔写进 `JEV_ALLOWED_HOSTS`。页面没有填 Key、使用服务端 `JEV_API_KEY` 时，代理忽略页面的 Endpoint，只转发到 `JEV_TARGET`，服务端 Key 不会被发往其他主机。网络失败、429 和 529 会自动退避重试两次。
 
 服务端推荐使用 `JEV_API_KEY`。每回合页面只通过本地 `/api/jev` 路由提交当前玩家的一个独立请求；当前玩家完成叫分或出牌、牌局状态更新后，下一回合才请求下一位。请求只包含当前玩家的完整手牌，其他玩家只以姓名、角色和手牌数量等公开信息出现，不会把其他玩家的牌面发给当前 Jev。页面中的 API Key 输入只作为临时覆盖，不会写入仓库或 `localStorage`。
 
