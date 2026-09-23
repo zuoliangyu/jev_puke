@@ -77,22 +77,40 @@ export function renderScore() {
   }
 }
 
-export function log(message, kind = "") {
+const LOG_LIMIT = 65;
+
+function formatBytes(size) {
+  return size < 1024 ? `${size} B` : `${(size / 1024).toFixed(1)} KB`;
+}
+
+/**
+ * 追加一条日志。detail 是可选的 {label, data}，会渲染成可展开的 JSON；
+ * 逐条追加而不是整体重绘，这样已展开的请求体不会被下一条日志收起。
+ */
+export function log(message, kind = "", detail = null) {
   const logElement = $("#log");
   const follow =
     !logElement ||
     logElement.scrollHeight - logElement.scrollTop - logElement.clientHeight <
       36;
-  state.logs.push({ message, kind, time: time() });
-  if (state.logs.length > 65) state.logs.shift();
+  const entry = { message, kind, time: time(), detail };
+  state.logs.push(entry);
+  if (state.logs.length > LOG_LIMIT) state.logs.shift();
   if (!logElement) return;
 
-  logElement.innerHTML = state.logs
-    .map(
-      (entry) =>
-        `<div class="entry ${entry.kind}"><time>${entry.time}</time><span>${entry.message}</span></div>`,
-    )
-    .join("");
+  logElement.querySelector(":scope > p")?.remove();
+  const element = document.createElement("div");
+  element.className = `entry ${kind}`.trim();
+  let html = `<time>${entry.time}</time><span>${message}</span>`;
+  if (detail) {
+    const json = JSON.stringify(detail.data, null, 2);
+    html += `<details class="entry-detail"><summary>${esc(detail.label)} · ${formatBytes(new TextEncoder().encode(json).length)}</summary><pre>${esc(json)}</pre></details>`;
+  }
+  element.innerHTML = html;
+  logElement.append(element);
+  const entries = logElement.querySelectorAll(":scope > .entry");
+  for (let index = 0; index < entries.length - LOG_LIMIT; index += 1)
+    entries[index].remove();
   if (follow) logElement.scrollTop = logElement.scrollHeight;
 }
 

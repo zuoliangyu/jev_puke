@@ -221,6 +221,31 @@
   color: var(--muted2);
   font-style: normal;
 }
+.entry-detail {
+  grid-column: 2;
+  min-width: 0;
+}
+.entry-detail summary {
+  color: var(--muted);
+  cursor: pointer;
+  font: 11px var(--mono);
+}
+.entry-detail summary:hover {
+  color: var(--amber);
+}
+.entry-detail pre {
+  max-height: 260px;
+  margin: 6px 0 0;
+  padding: 8px 10px;
+  overflow: auto;
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  color: #b7e5c4;
+  background: #06110caa;
+  font: 11px/1.55 var(--mono);
+  white-space: pre-wrap;
+  word-break: break-all;
+}
 .entry.ok span {
   color: var(--green);
 }

@@ -20,7 +20,6 @@ import {
   updatePhase,
 } from "../ui/render.js";
 import {
-  getRequestInfo,
   loadApiStatus,
   requestJev,
   updateApiMode,
@@ -319,14 +318,14 @@ async function runJev() {
 
   try {
     if (state.apiReady === null) await loadApiStatus();
-    const requestInfo = getRequestInfo();
-    if (!requestInfo.demo) {
+    const response = await requestJev((payload, route) => {
+      const host = (url) => url.replace(/^https?:\/\//, "");
       log(
-        `<b>POST</b> · 当前玩家独立 Jev 请求 → ${requestInfo.target.replace(/^https?:\/\//, "")}`,
+        `<b>POST</b> · 当前玩家独立 Jev 请求 → ${host(route.target)}${route.upstream ? ` → ${host(route.upstream)}` : ""}`,
         "wait",
+        { label: "请求体（不含 Key）", data: payload },
       );
-    }
-    const response = await requestJev();
+    });
     if (response.demo) {
       log("<b>演示响应</b> · 本地模拟 Jev 选择", "ok");
     } else {

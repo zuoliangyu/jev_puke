@@ -385,7 +385,7 @@ function errorMessage(payload) {
   );
 }
 
-async function requestOne(id, target, key, endpoint) {
+async function requestOne(id, target, key, endpoint, payload) {
   const controller = new AbortController();
   const timeout = window.setTimeout(() => controller.abort(), 25_000);
   let response;
@@ -400,7 +400,7 @@ async function requestOne(id, target, key, endpoint) {
           ? { "X-Jev-Target": endpoint }
           : {}),
       },
-      body: JSON.stringify(buildPayload(id)),
+      body: JSON.stringify(payload),
       signal: controller.signal,
     });
   } catch (error) {
@@ -425,7 +425,8 @@ async function requestOne(id, target, key, endpoint) {
   return parsed;
 }
 
-export async function requestJev() {
+// onRequest(payload, route) 在真正发出请求前调用，用来把请求体写进日志
+export async function requestJev(onRequest) {
   if (state.apiReady === null) await loadApiStatus();
 
   const currentId = ids[state.current];
@@ -450,12 +451,14 @@ export async function requestJev() {
     };
   }
 
-  const result = await requestOne(
-    currentId,
+  const endpoint = $("#endpoint").value.trim();
+  const payload = buildPayload(currentId);
+  const forwarded = Boolean(key && endpoint && target !== endpoint);
+  onRequest?.(payload, {
     target,
-    key,
-    $("#endpoint").value.trim(),
-  );
+    upstream: forwarded ? endpoint : "",
+  });
+  const result = await requestOne(currentId, target, key, endpoint, payload);
   return {
     result,
     data: { [currentId]: normalize(result, currentId) },
