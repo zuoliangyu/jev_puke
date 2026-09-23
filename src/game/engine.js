@@ -46,7 +46,6 @@ export function resetView() {
   state.passCount = 0;
   ids.forEach((id) => {
     state.playedBy[id] = 0;
-    state.scoreTotals[id] = 0;
   });
   Object.values(state.players).forEach((player) => (player.hand = []));
   resetScore();
